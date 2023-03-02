@@ -204,20 +204,20 @@ SPA의 특성상 URL이 바뀌지 않은 상태로 컴포넌트만 바뀌면서 
 한 파일을 이용해서 관리를 하기 때문에 많은 내용의 CSS가 한 파일에 있어야하고, 그러면 나중에 관리가 힘들어진다.
 중복되는 CSS가 발생될 수 있고, 정말 잘 짜지 않으면 처음 썼던 CSS 내용이 적용이 안될 수 있다.
 
-React에서 CSS를 적용하는 방법은 3가지가 있다.
+React에서 CSS를 적용하는 방법은 4가지가 있다.
 
-기본적으로 패키지를 선택하고
+기본적으로 패키지를 선택하고 webpack.config.js 설정을 해주어야한다.
 
 ```sh
 $ npm install style-loader css-loader
 ```
 
 ```js
-
-            {
-                test: /\.css$/,
-                use: ["style-loader", "css-loader"],
-            },
+// module.rules
+    {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+    },
 ```
 
 ## 방법 1. inline-style 이용하기
@@ -354,3 +354,9 @@ const Style = () => {
 
 export default Style
 ```
+
+쉽게 생각하면 스타일이 적용된 컴포넌트를 만들 수 있다.
+`(백택)을 이용해서 스타일을 적용시키기 때문에 스트링이라 보기 불편하고, 자동완성이 안되는데, 
+확장 프로그램 중에 `vscode-styled-components` 라는 확장프로그램을 사용하면 CSS 파일처럼 속성과 값이 구분 된다.
+
+props를 이용하여 조건문을 작성하고, 값을 줄 수 있다. &기호는 자기 자신을 말하는 기호이므로 `&:hover`는 자기 자신이 hover 됐을 때를 의미한다.
