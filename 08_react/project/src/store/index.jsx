@@ -1,0 +1,14 @@
+import { createContext, useContext, useReducer } from "react"
+import { rootReducer } from "./reducer"
+
+export const Context = createContext()
+export const useStore = () => useContext(Context)
+
+export const StoreProvider = ({ children }) => {
+    const initialState = {
+        isLogin: false,
+        user: {},
+    }
+    const [state, dispatch] = useReducer(rootReducer, initialState)
+    return <Context.Provider value={[state, dispatch]}>{children}</Context.Provider>
+}
