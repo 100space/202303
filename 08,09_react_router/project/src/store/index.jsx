@@ -3,8 +3,8 @@ import { rootReducer } from "./reducer"
 
 export const Context = createContext()
 export const useStore = () => useContext(Context)
-
 export const StoreProvider = ({ children }) => {
+    //
     const initialState = {
         isLogin: false,
         user: {},

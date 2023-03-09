@@ -4,6 +4,7 @@ import { useStore } from "../../store"
 
 export const Header = () => {
     const [state, dispatch] = useStore()
+    console.log(useStore())
 
     const category = [
         { path: "/", name: "Home" },

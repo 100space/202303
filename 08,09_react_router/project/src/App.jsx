@@ -19,6 +19,7 @@ const App = () => {
                         <Route path="modify/:id" element={<BoardModify />} />
                         <Route path="view/:id" element={<BoardView />} />
                     </Route>
+                    {/*  */}
                 </Routes>
             </BrowserRouter>
         </StoreProvider>
