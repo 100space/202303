@@ -189,3 +189,116 @@ export const Login = () => {
 import로 useStore을 불러온 후 실행하면 state와 dispatch()가 있는 객체를 반환한다.
 
 이를 구조분해할당으로 사용하면 된다.
+
+# 상태 관리하기
+
+React는 데이터가 바뀌면서 화면이 바뀐다.
+
+로그인 로직을 크게 생각해보면
+
+1. 사용자가 userid, userpw을 입력한다.
+2. userid, pw를 서버로 데이터를 보낸다.
+3. DB의 저장되어 있는 정보와 비교 후 데이터를 브라우저도 보내준다
+4. 유저의 상태가 바뀌면서 로그인 처리가 된다.
+
+정말 간단하게 로그인 과정을 설명한 내용이다.
+
+이러한 과정을 통해서 로그인을 성공하면 login 상태인 유저를 판단하고 그에 따른 화면을 그려줄 수 있다.
+(회원/비회원 페이지를 다르게 한다.)
+
+하지만 React에서 상태라는 것은 변수와 같다.
+다른 말로 페이지에서 새로고침을 하게되면 React 컴포넌트를 다시 렌더링하면서 state에 있던 상태가 초기화가 되는 것이다.
+
+그렇기 때문에 새로고침이 일어나면 안되는 것이고,
+새로고침이 되면 상태가 초기상태로 돌아가서 로그인 같은 경우는 새로고침이 풀린 상태가 되는 것이다.
+
+```js
+let isLogin = false
+isLogin = true
+
+//새로고침 후
+console.log(isLogin) // false
+```
+
+하지만 로그인 같은 데이터는 새로고침이 되더라도 데이터가 남아있어야 한다.
+(사용자가 새로고침을 눌렀을 때 다시 로그인을 하라고 할 수 없기 때문에)
+javascript 변수를 어딘가에 저장을 해야한다는 뜻이다.
+
+React의 런타임은 브라우저이다. 브라우저에서 코드가 실행된다는 뜻이다.
+브라우저에서 실행이 되기 때문에 브라우저에서 지원하는 웹 스토리지인 로컬스토리지(localStorage)를 이용하여 데이터를 관리하면 새로고침 때문에 로그인이 풀리는 상황은 방지할 수 있다.
+
+**local Storage VS Sesstion Storage**
+둘의 역할은 비슷하다.
+로컬이든 세션이든 새로고침을 하면 데이터가 유지된다.
+하지만 가장 큰 차이점은 로컬은 여러 탭에서 유지가 되지만, 세션의 경우에는 그 해당 탭에서만 유효하다.
+
+필요하다면 sessionStorage을 사용해도 되지만 localStorage를 이용할 예정이다.
+
+## 로그인 프로세스
+
+SSR 방식과 CSR 방식에 따라 차이가 있지만
+리엑트는 SPA로 CSR방식을 살펴보면 사진과 같다.
+
+로그인을 하는 과정에서 로그인 처리를 하면서 로컬스토리지에 저장으로 끝나는 것이 아니라
+화면을 렌더링 할 때 로컬스토리지에 데이터가 있는지 확인하고 있다면 로컬 스토리지에 있는 데이터(토큰)을 가져와서 isLogin에 다시 선언하는 과정이 필요하다.
+
+## store
+
+로컬 스토리지에 데이터를 저장하고, 저장되어 있는 데이터를 가져와서 전역상태로 관리해야하기 때문에
+이 로직은 전역 상태를 관리하는 컴포넌트인 store에서 처리한다.
+
+```js
+// /store/index.jsx
+
+export const StoreProvider = ({ children }) => {
+    const initialState = {
+        isLogin: false,
+        user: {},
+    }
+    const [state, dispatch] = useReducer(rootReducer, initialState)
+    const [persisedState, setPersistedState] = usePersistedState("state", state)
+
+    // 기본형태 globalState = {state, dispatch}
+    // 현재상태와 커스텀 된 dispatch 함수
+    const globalState = {
+        state: persisedState,
+        //dispatch를 로직 추가를 위해서 변경
+        dispatch: (action) => {
+            dispatch(action)
+            //rootReducer(persisedState, action)의 리턴값은 객체(상태)
+            setPersistedState(rootReducer(persisedState, action))
+        },
+    }
+
+    return <Context.Provider value={globalState}>{children}</Context.Provider>
+}
+
+//
+//
+//
+
+//usePersistedState.jsx  // 커스텀 훅
+
+import { useState, useEffect } from "react"
+
+export const usePersistedState = (key, initialState) => {
+    // 기본형태 : const [state, setState] = useState(초기값)
+    const [state, setState] = useState(() => {
+        const storagedState = localStorage.getItem(key)
+
+        return !storagedState ? initialState : JSON.parse(storagedState)
+    })
+
+    // key || state 의 변화가 있을 때 실행
+    // localStorage의 상태 값 동기화
+    useEffect(() => {
+        localStorage.setItem(key, JSON.stringify(state))
+    }, [key, state])
+
+    const changeStorage = (change) => {
+        setState(change)
+    }
+
+    return [state, changeStorage]
+}
+```

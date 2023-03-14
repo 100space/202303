@@ -19,10 +19,11 @@ export const StoreProvider = ({ children }) => {
     //     : JSON.parse(storageState) // 있을 때
 
     const [state, dispatch] = useReducer(rootReducer, initialState)
-    const [persisedState, setPersistedState] = usePersistedState("state", state)
+    const [persistedState, setPersistedState] = usePersistedState("state", state)
 
     const globalState = {
-        state: persisedState,
+        // 리턴값은 현재상태와 커스텀 된 dispatch 함수
+        state: persistedState,
 
         //dispatch를 임의로 변경..(로직 추가를 위해서 변경)
         dispatch: (action) => {
@@ -32,7 +33,8 @@ export const StoreProvider = ({ children }) => {
             // localStorage.setItem("state", JSON.stringify(rootReducer(state, action)))
 
             //커스텀 훅으로 빼기..
-            setPersistedState(rootReducer(persisedState, action))
+            console.log(rootReducer(persistedState, action), 123123)
+            setPersistedState(rootReducer(persistedState, action))
         },
     }
 
