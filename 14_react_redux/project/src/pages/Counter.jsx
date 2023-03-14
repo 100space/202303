@@ -5,7 +5,6 @@ import { useSelector, useDispatch } from "react-redux"
 export const Counter = () => {
     const dispatch = useDispatch() // provider안에 store에 있는 dispatch 를 가져올 수 있다. store.dispatch()
     const { loading, error, data } = useSelector((state) => state.counter) // {loading, error,data:{count}}
-
     useEffect(() => {
         console.log(loading, error, data)
         ;(async () => {
