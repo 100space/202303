@@ -20,6 +20,22 @@ app.get("/categories", (req, res) => {
         { path: "/counter", name: "counter" },
     ])
 })
+app.get("/login", (req, res) => {
+    res.json({
+        isLogin: true,
+        data: {
+            userid: "baekspace",
+        },
+    })
+})
+app.get("/logout", (req, res) => {
+    res.json({
+        isLogin: false,
+        data: {
+            userid: "",
+        },
+    })
+})
 
 app.listen(3005, () => {
     console.log("server start")
