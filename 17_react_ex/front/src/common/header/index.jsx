@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom"
 import styled from "styled-components"
+import { DarkModeToggle } from "react-dark-mode-toggle-2"
+import { useState } from "react"
 
 const Ul = styled.ul`
     display: flex;
@@ -9,6 +11,7 @@ const Ul = styled.ul`
     }
 `
 export const Header = () => {
+    const [isDarkMode, setIsDarkMode] = useState(false)
     return (
         <>
             <Ul>
@@ -22,6 +25,7 @@ export const Header = () => {
                     <NavLink to="/login">Login</NavLink>
                 </li>
             </Ul>
+            <DarkModeToggle onChange={setIsDarkMode} isDarkMode={isDarkMode} size={"10rem"} />
         </>
     )
 }
